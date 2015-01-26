@@ -4,8 +4,8 @@ var url = 'click.mp3',
     audioContext = null,
     isPlaying = false,
     current4Note, 
-    tempo = 120,
-    lookahead = 0.25,
+    tempo = 60 / 120,
+    lookahead = 1000,
     nextNoteTime = 0,
     scheduleAheadTime = 0.1,  // не могу еще толком понять вот эту штуку
     timerId,
@@ -53,11 +53,18 @@ function play() {
 
 function scheduler() {
 
-  while ( nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
-        scheduleNote( nextNoteTime );
-        nextNote();
+  //if (nextNoteTime < ) {
+    for (var bar = 0; bar < 10; bar++) {
+      var time = nextNoteTime + bar * tempo;
+      scheduleNote(time);  
     }
-    timerID = window.setTimeout( scheduler, lookahead );
+    nextNoteTime = time + 0.5;
+  //}
+  // while ( nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
+  //       scheduleNote( nextNoteTime );
+  //       nextNote();
+  //   }
+     timerID = window.setTimeout( scheduler, lookahead );
 
 }
 
@@ -66,7 +73,7 @@ function scheduleNote(time) {
   source = audioContext.createBufferSource();
   source.buffer = click;
   source.connect(audioContext.destination);
-  console.log('ya tytle')
+  console.log(time);
   source.start(time);
 
   //source.stop( time + 0.05); 
