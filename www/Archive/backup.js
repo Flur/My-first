@@ -1,4 +1,3 @@
-"use strict";
 document.body.onload = (function(){
 
 // define variables

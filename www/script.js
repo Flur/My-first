@@ -1,60 +1,111 @@
-"use strict";
-document.body.onload = (function(){
+(function() { 
+var buffer = null;
+var context = null;
+var tempo = document.getElementById('time');
+var source = null;
 
-// define variables
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    // Fix up prefixing
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    context = new AudioContext();  
+  }
+  catch(e) {
+    alert("Web Audio API is not supported in this browser");
+  }
 
-var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-var source;
+  loadClick = new BufferLoader(context, ['click.mp3'], 
+    function(bufferList){buffer = bufferList[0];});
+  loadClick.load();
 
-var play = document.querySelector('.start');
-var stop = document.querySelector('.stop');
+});
 
-// use XHR to load an audio track, and
-// decodeAudioData to decode it and stick it in a buffer.
-// Then we put the buffer into the source
 
-function getData() {
-  source = audioCtx.createBufferSource();
+function BufferLoader(context, urlList, callback) {
+  this.context = context;
+  this.urlList = urlList;
+  this.onload = callback;
+  this.bufferList = new Array();
+  this.loadCount = 0;
+}
+
+BufferLoader.prototype.loadBuffer = function(url, index) {
+  // Load buffer asynchronously
   var request = new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.responseType = "arraybuffer";
 
-  request.open('GET', 'click.mp3', true);
-
-  request.responseType = 'arraybuffer';
-
+  var loader = this;
 
   request.onload = function() {
-    console.log('request.response');
-    var audioData = request.response;
-
-    audioCtx.decodeAudioData(audioData, function(buffer) {
-        source.buffer = buffer;
-
-        source.connect(audioCtx.destination);
-        source.loop = true;
+    // Asynchronously decode the audio file data in request.response
+    loader.context.decodeAudioData(
+      request.response,
+      function(buffer) {
+        if (!buffer) {
+          alert('error decoding file data: ' + url);
+          return;
+        }
+        loader.bufferList[index] = buffer;
+        if (++loader.loadCount == loader.urlList.length)
+          loader.onload(loader.bufferList);
       },
+      function(error) {
+        console.error('decodeAudioData error', error);
+      }
+    );
+  }
 
-      function(e){"Error with decoding audio data" + e.err});
-
+  request.onerror = function() {
+    alert('BufferLoader: XHR error');
   }
 
   request.send();
 }
 
-// wire up buttons to stop and play audio
-
-play.onclick = function() {
-  getData();
-  source.start(0);
-  play.setAttribute('disabled', 'disabled');
+BufferLoader.prototype.load = function() {
+  for (var i = 0; i < this.urlList.length; ++i)
+  this.loadBuffer(this.urlList[i], i);
 }
 
-stop.onclick = function() {
-  source.stop(0);
-  play.removeAttribute('disabled');
+function playSound(thisBuffer, time) {
+  source = context.createBufferSource();
+  source.buffer = thisBuffer;
+  source.connect(context.destination);
+  console.log(time);
+  if (!source.start)
+    source.start = source.noteOn;
+  source.start(time);
 }
 
+function start() {
+  var bpm = tempo.value ? tempo.value : 60;
+  var startTime = context.currentTime + 0.100;
+  var quarterNoteTime = (60 / bpm);
+  var time = null;
+  
+  function run() {
+    for (var bar = 0; bar < 60; bar++) {
+      time = startTime + bar * quarterNoteTime;
+      //console.trace();
 
+      playSound(buffer, time);  
+    }
+    startTime += time;
+  }
+  
+  //setInterval(run(),61000);
 
+}
 
+function stop() {
+  source.stop();
+  console.log('ya')
+}
 
-}());
+var startButton = document.getElementById("start");
+startButton.onclick = start;
+})();
+
+var stopButton = document.getElementById("stop");
+stopButton.onclick = stop();
