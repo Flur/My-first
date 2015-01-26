@@ -66,6 +66,7 @@ function scheduleNote(time) {
   source = audioContext.createBufferSource();
   source.buffer = click;
   source.connect(audioContext.destination);
+  console.log('ya tytle')
   source.start(time);
 
   //source.stop( time + 0.05); 
@@ -80,7 +81,7 @@ function nextNote() {
 
   current4Note++;
 
-  if (current4Note == 4) {
+  if (current4Note == 32) {
         current4Note = 0;
     }
 
