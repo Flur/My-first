@@ -1,111 +1,138 @@
-(function() { 
-var buffer = null;
-var context = null;
-var tempo = document.getElementById('time');
-var source = null;
+//(function() { 
 
-document.addEventListener('DOMContentLoaded', function() {
-  try {
+var url = 'click.mp3',      
+    audioContext = null,
+    isPlaying = false,
+    current4Note, 
+    tempo = 120,
+    lookahead = 0.25,
+    nextNoteTime = 0,
+    scheduleAheadTime = 0.1,  // не могу еще толком понять вот эту штуку
+    timerId,
+    loadClick,
+    timerId,
+    source,
+    click;
+
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+ 
+ // Checking browser for WebAudio Support
+ try {
     // Fix up prefixing
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    context = new AudioContext();  
+    audioContext = new AudioContext();
   }
   catch(e) {
     alert("Web Audio API is not supported in this browser");
-  }
+  }  
 
-  loadClick = new BufferLoader(context, ['click.mp3'], 
-    function(bufferList){buffer = bufferList[0];});
+// Asynchronously load click sound from server
+  loadClick = new BufferLoader(audioContext, [url], 
+    function(bufferList){click = bufferList[0];});
   loadClick.load();
 
-});
-
-
-function BufferLoader(context, urlList, callback) {
-  this.context = context;
-  this.urlList = urlList;
-  this.onload = callback;
-  this.bufferList = new Array();
-  this.loadCount = 0;
 }
 
-BufferLoader.prototype.loadBuffer = function(url, index) {
-  // Load buffer asynchronously
-  var request = new XMLHttpRequest();
-  request.open("GET", url, true);
-  request.responseType = "arraybuffer";
+function play() {
 
-  var loader = this;
+  isPlaying = !isPlaying;
 
-  request.onload = function() {
-    // Asynchronously decode the audio file data in request.response
-    loader.context.decodeAudioData(
-      request.response,
-      function(buffer) {
-        if (!buffer) {
-          alert('error decoding file data: ' + url);
-          return;
-        }
-        loader.bufferList[index] = buffer;
-        if (++loader.loadCount == loader.urlList.length)
-          loader.onload(loader.bufferList);
-      },
-      function(error) {
-        console.error('decodeAudioData error', error);
-      }
-    );
+  if ( isPlaying ) {
+    current4Note = 0;
+    nextNoteTime = audioContext.currentTime;
+    scheduler();
+    return "stop";
+  } else {
+    window.clearTimeout( timerID );
+    return "play";
   }
 
-  request.onerror = function() {
-    alert('BufferLoader: XHR error');
-  }
-
-  request.send();
 }
 
-BufferLoader.prototype.load = function() {
-  for (var i = 0; i < this.urlList.length; ++i)
-  this.loadBuffer(this.urlList[i], i);
-}
+function scheduler() {
 
-function playSound(thisBuffer, time) {
-  source = context.createBufferSource();
-  source.buffer = thisBuffer;
-  source.connect(context.destination);
-  console.log(time);
-  if (!source.start)
-    source.start = source.noteOn;
-  source.start(time);
-}
-
-function start() {
-  var bpm = tempo.value ? tempo.value : 60;
-  var startTime = context.currentTime + 0.100;
-  var quarterNoteTime = (60 / bpm);
-  var time = null;
-  
-  function run() {
-    for (var bar = 0; bar < 60; bar++) {
-      time = startTime + bar * quarterNoteTime;
-      //console.trace();
-
-      playSound(buffer, time);  
+  while ( nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
+        scheduleNote( nextNoteTime );
+        nextNote();
     }
-    startTime += time;
+    timerID = window.setTimeout( scheduler, lookahead );
+
+}
+
+function scheduleNote(time) {
+
+  source = audioContext.createBufferSource();
+  source.buffer = click;
+  source.connect(audioContext.destination);
+  source.start(time);
+
+  //source.stop( time + 0.05); 
+
+}
+
+function nextNote() {
+
+  var secondsPerBeat = 60.0 / tempo;
+
+  nextNoteTime += secondsPerBeat;
+
+  current4Note++;
+
+  if (current4Note == 4) {
+        current4Note = 0;
+    }
+
+}
+
+// XML request for sound load
+// TODO: rewrite this to simple function!
+  function BufferLoader( context, urlList, callback ) {
+    this.context = context;
+    this.urlList = urlList;
+    this.onload = callback;
+    this.bufferList = new Array();
+    this.loadCount = 0;
   }
-  
-  //setInterval(run(),61000);
 
-}
+  BufferLoader.prototype.loadBuffer = function( url, index ) {
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
 
-function stop() {
-  source.stop();
-  console.log('ya')
-}
+    var loader = this;
 
-var startButton = document.getElementById("start");
-startButton.onclick = start;
-})();
+    request.onload = function() {
+      // Asynchronously decode the audio file data in request.response
+      loader.context.decodeAudioData(
+        request.response,
+        function(buffer) {
+          if (!buffer) {
+            alert( 'error decoding file data: ' + url );
+            return;
+          }
+          loader.bufferList[index] = buffer;
+          if ( ++loader.loadCount == loader.urlList.length )
+            loader.onload( loader.bufferList );
+        },
+        function(error) {
+          console.error( 'decodeAudioData error', error );
+        }
+      );
+    }
 
-var stopButton = document.getElementById("stop");
-stopButton.onclick = stop();
+    request.onerror = function() {
+      alert('BufferLoader: XHR error');
+    }
+
+    request.send();
+  }
+
+  BufferLoader.prototype.load = function() {
+    for (var i = 0; i < this.urlList.length; ++i)
+    this.loadBuffer(this.urlList[i], i);
+  }
+
+//})();
