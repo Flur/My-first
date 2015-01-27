@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="uk">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- TODO make this thing good for browsers -->
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Метроном</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
 <!-- BODY -->
   <body>
-    <p>Введіть bpm:<input type="text" id="time"></p>
-    <p><button id="start" class="start">Start</button></p>
-    <p><button id="stop" class="stop">Stop</button></p>
-    <p>P.S Поки що всьо відбувається в розмірі 4/4.</p>
+    <h1>Метроном онлайн</h1>
+    <!-- <div class=" style="wrapper"">Something
+    <div class="tooltip">I am a tooltip!</div>
+    </div>
+ -->
+      <p><input type="text" id="bpm" title="" placeholder="120" min="40" max="240"></p>
+      <div id="error"></div>
+      <p><input type="range" id="range" min="40" max="240"></p>
+      <p><button id="play">Start</button></p>
+      
+    <footer><small>by Flur</small></footer>  
+    <script src="metronome.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
