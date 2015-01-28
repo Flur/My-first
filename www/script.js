@@ -3,13 +3,14 @@
 var playButton = document.getElementById("play"),
     bpm = document.getElementById('bpm'),
     range = document.getElementById('range'),
-    error = document.getElementById('error'),
     minus = document.getElementById('minus'),
-    plus = document.getElementById('plus');
+    plus = document.getElementById('plus'),
+    playImg = "images/play.png",
+    stopImg = "images/stop.png";
 
 document.addEventListener('DOMContentLoaded', init);    
 
-playButton.onclick = function() {playButton.innerHTML = play();};
+playButton.onclick = function() {playButton.src = play();};
 range.oninput = function() {
 	tempo = bpm.innerHTML = parseInt(range.value, 10); // from string to integer
 };

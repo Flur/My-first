@@ -11,13 +11,13 @@
 <!-- BODY -->
   <body>
     <h1>Метроном онлайн</h1>
-    <!-- <div class=" style="wrapper"">Something
-    <div class="tooltip">I am a tooltip!</div>
-    </div>
- -->  <p><button type="button" id="minus">-</button><h3 id="bpm">120</h3><button type="button" id="plus">+</button></p>
-      <p><input type="range" id="range" min="40" max="240" value="120" required="" step="1"></p>
-      <p><button type="button" id="play">Start</button></p>
-
+    <p>
+      <input type="image" src="images/minus.png" id="minus" title="Зменьшити темп"/>
+      <h3 id="bpm" title="Темп">120</h3>
+      <input type="image" src="images/plus.png" id="plus" title="Збільшити темп"/>
+    </p>
+    <p><input type="range" id="range" min="40" max="240" value="120" step="1" class="range-black"/></p>
+    <p><input type="image" src="images/play.png" id="play" /></p>
     <footer><small>Поки усьо в 4/4 :)</small></footer>  
     <script src="metronome.js"></script>
     <script src="script.js"></script>

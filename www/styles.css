@@ -7,93 +7,85 @@ input {
 	text-align: center;
 }
 
-
-
-.wrapper {
-  text-transform: uppercase;
-  background: #ececec;
-  color: #555;
-  cursor: help;
-  font-family: "Gill Sans", Impact, sans-serif;
-  font-size: 20px;
-  margin: 100px 75px 10px 75px;
-  padding: 15px 20px;
-  position: relative;
-  text-align: center;
-  width: 200px;
-  -webkit-transform: translateZ(0); /* webkit flicker fix */
-  -webkit-font-smoothing: antialiased; /* webkit text rendering fix */
+input[type=range].range-black {
+  -webkit-appearance: none;
+  width: 20%;
+  margin: 15.5px 0;
 }
-
-.wrapper .tooltip {
-  background: #1496bb;
-  bottom: 100%;
-  color: #fff;
-  display: block;
-  left: -25px;
-  margin-bottom: 15px;
-  opacity: 0;
-  padding: 20px;
-  pointer-events: none;
-  position: absolute;
+input[type=range].range-black:focus {
+  outline: none;
+}
+input[type=range].range-black::-webkit-slider-runnable-track {	
+  background-image: url("images/line3.png");
+  background-repeat: no-repeat;
+}
+input[type=range].range-black::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #000000;
+  height: 32px;
+  width: 32px;
+  border-radius: 4px;
+  background-image: url("images/square.png");
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -10px;
+}
+input[type=range].range-black:focus::-webkit-slider-runnable-track {
+  background-image: url("images/line3.png");
+  background-repeat: no-repeat;
+}
+input[type=range].range-black::-moz-range-track {
   width: 100%;
-  -webkit-transform: translateY(10px);
-     -moz-transform: translateY(10px);
-      -ms-transform: translateY(10px);
-       -o-transform: translateY(10px);
-          transform: translateY(10px);
-  -webkit-transition: all .25s ease-out;
-     -moz-transition: all .25s ease-out;
-      -ms-transition: all .25s ease-out;
-       -o-transition: all .25s ease-out;
-          transition: all .25s ease-out;
-  -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-     -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-      -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-       -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
-          box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+  height: 1px;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
+  background: rgba(0, 113, 0, 0);
+  border-radius: 25px;
+  border: 2px solid #000101;
 }
-
-/* This bridges the gap so you can mouse into the tooltip without it disappearing */
-.wrapper .tooltip:before {
-  bottom: -20px;
-  content: " ";
-  display: block;
-  height: 20px;
-  left: 0;
-  position: absolute;
+input[type=range].range-black::-moz-range-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 5px solid #000000;
+  height: 32px;
+  width: 32px;
+  border-radius: 4px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range].range-black::-ms-track {
   width: 100%;
-}  
+  height: 1px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range].range-black::-ms-fill-lower {
+  background: rgba(0, 108, 0, 0);
+  border: 2px solid #000101;
+  border-radius: 50px;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
+}
+input[type=range].range-black::-ms-fill-upper {
+  background: rgba(0, 113, 0, 0);
+  border: 2px solid #000101;
+  border-radius: 50px;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
+}
+input[type=range].range-black::-ms-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 5px solid #000000;
+  height: 32px;
+  width: 32px;
+  border-radius: 4px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 1px;
+}
+input[type=range].range-black:focus::-ms-fill-lower {
+  background: rgba(0, 113, 0, 0);
+}
+input[type=range].range-black:focus::-ms-fill-upper {
+  background: rgba(0, 118, 0, 0);
+}
 
-/* CSS Triangles - see Trevor's post */
-.wrapper .tooltip:after {
-  border-left: solid transparent 10px;
-  border-right: solid transparent 10px;
-  border-top: solid #1496bb 10px;
-  bottom: -10px;
-  content: " ";
-  height: 0;
-  left: 50%;
-  margin-left: -13px;
-  position: absolute;
-  width: 0;
-}
-  
-.wrapper:hover .tooltip {
-  opacity: 1;
-  pointer-events: auto;
-  -webkit-transform: translateY(0px);
-     -moz-transform: translateY(0px);
-      -ms-transform: translateY(0px);
-       -o-transform: translateY(0px);
-          transform: translateY(0px);
-}
-
-/* IE can just show/hide with no transition */
-.lte8 .wrapper .tooltip {
-  display: none;
-}
-
-.lte8 .wrapper:hover .tooltip {
-  display: block;
-}

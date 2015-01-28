@@ -4,7 +4,7 @@ var url = 'click.mp3',
     isPlaying = false,
     current4Note, 
     tempo = 120,
-    lookahead = 0.25,
+    lookahead = 1,
     nextNoteTime = 0,
     scheduleAheadTime = 0.1,
     loadClick,
@@ -37,10 +37,10 @@ function play () {
     current4Note = 0;
     nextNoteTime = audioContext.currentTime;
     scheduler();
-    return "Stop";
+    return stopImg;
   } else {
     window.clearTimeout( timerID );
-    return "Play";
+    return playImg;
   }
 
 }
@@ -58,7 +58,7 @@ function scheduler() {
   //   nextNoteTime = time + 0.5;
   //  } 
   //}
-  
+
   while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
         scheduleNote( nextNoteTime );
         nextNote();
@@ -81,12 +81,11 @@ function nextNote() {
   var intervalSec = 60 / tempo;
   nextNoteTime += intervalSec;
 
-  // FOR akcent
+  // TODO: make accent
   // current4Note++;
   // if (current4Note == 4) {
   //       current4Note = 0;
   //   }
-
 }
 
 // XML request for sound load
