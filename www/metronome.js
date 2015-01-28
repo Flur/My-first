@@ -1,3 +1,4 @@
+// Metronome part
 var url = 'click.mp3',      
     audioContext = null,
     isPlaying = false,
@@ -30,12 +31,6 @@ function init () {
 
 function play () {
 
-  if (bpm.value) {
-    tempo = 60 / bpm.value;
-  } else {
-    tempo = 0.5;
-  }
-
   isPlaying = !isPlaying;
 
   if ( isPlaying ) {
@@ -63,6 +58,7 @@ function scheduler() {
   //   nextNoteTime = time + 0.5;
   //  } 
   //}
+  
   while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
         scheduleNote( nextNoteTime );
         nextNote();
@@ -76,13 +72,14 @@ function scheduleNote(time) {
   source.buffer = click;
   source.connect(audioContext.destination);
   source.start(time);
-  source.stop( time + 0.05 ); 
+  source.stop( time + 0.1 ); 
 
 }
 
 function nextNote() {
 
-  nextNoteTime += tempo;
+  var intervalSec = 60 / tempo;
+  nextNoteTime += intervalSec;
 
   // FOR akcent
   // current4Note++;

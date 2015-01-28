@@ -14,15 +14,11 @@
     <!-- <div class=" style="wrapper"">Something
     <div class="tooltip">I am a tooltip!</div>
     </div>
- -->
-    <form id="form">
-      <p><input type="text" id="bpm" title="" placeholder="120" min="40" max="240"></p>
-      <div id="error"></div>
-      <p><input type="range" id="range" min="40" max="240"></p>
-      <p><button form="form" id="play">Start</button></p>
-    <form>
+ -->  <p><button type="button" id="minus">-</button><h3 id="bpm">120</h3><button type="button" id="plus">+</button></p>
+      <p><input type="range" id="range" min="40" max="240" value="120" required="" step="1"></p>
+      <p><button type="button" id="play">Start</button></p>
 
-    <footer><small>by Flur</small></footer>  
+    <footer><small>Поки усьо в 4/4 :)</small></footer>  
     <script src="metronome.js"></script>
     <script src="script.js"></script>
   </body>

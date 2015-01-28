@@ -1,16 +1,23 @@
-document.addEventListener('DOMContentLoaded', init);
+// DOM
+
 var playButton = document.getElementById("play"),
     bpm = document.getElementById('bpm'),
     range = document.getElementById('range'),
-    error = document.getElementById('error');
+    error = document.getElementById('error'),
+    minus = document.getElementById('minus'),
+    plus = document.getElementById('plus');
+
+document.addEventListener('DOMContentLoaded', init);    
 
 playButton.onclick = function() {playButton.innerHTML = play();};
-bpm.oninput = function() {
-  if (bpm.value > 240 || bpm.value < 40) {
-  	error.innerHTML = "Bpm має бути не більше 240 та не меньше 40";
-  } else {
-  	range.value = bpm.value;
-  }
-  
+range.oninput = function() {
+	tempo = bpm.innerHTML = parseInt(range.value, 10); // from string to integer
 };
-range.oninput = function() {bpm.value = range.value;};
+
+minus.onclick = function() {
+  range.value = bpm.innerHTML = (tempo === 40) ? tempo : tempo -= 1; 
+};
+
+plus.onclick = function() {
+	range.value = bpm.innerHTML = (tempo === 240) ? tempo : tempo += 1;
+}
