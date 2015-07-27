@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+<!-- TODO make this thing good for browsers -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Метроном</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+<!-- BODY -->
+  <body>
+    <h1>Метроном онлайн</h1>
+    <p>
+      <input type="image" src="images/minus.png" id="minus" title="Зменьшити темп"/>
+      <h3 id="bpm" title="Темп">120</h3>
+      <input type="image" src="images/plus.png" id="plus" title="Збільшити темп"/>
+    </p>
+    <p><input type="range" id="range" min="40" max="240" value="120" step="1" class="range-black"/></p>
+    <p><input type="image" src="images/play.png" id="play" /></p>
+    <footer><small>Поки усьо в 4/4 :)</small></footer>  
+    <script src="metronome.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
