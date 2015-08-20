@@ -7,18 +7,28 @@
 
   <body>
     <canvas id="canvas" width="600" height="600"></canvas>
+    <button>1</button>
+    <button>2</button>
+    <button>3</button>
+    <input type="text" id="input">
 
     <script type="x-shader/x-fragment" id="shader-fs">
+        precision mediump float; // for float precision!
+        varying vec4 v_color; // from vertex shader to here 
+
         void main() {
-          gl_FragColor = vec4(1, 0, 0, 1);  // green
+          gl_FragColor = v_color;  // green // vec4(1, 0, 0, 1)
         }
     </script>
 
     <script type="x-shader/x-vertex" id="shader-vs">
       attribute vec2 a_position;
 
+      varying vec4 v_color;
+
       void main() {
         gl_Position = vec4(a_position, 0, 1);
+        v_color = gl_Position * 0.5 + 0.5;
       }
     </script>
 
@@ -90,14 +100,17 @@
 
         var vertexBuffer = gl.createBuffer();
 
+        // sets the buffer to work on 
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // or ELEMENT_ARRAY_BUFFER for indexes
 
         var triangleVertices = [
            0.0,  0.5,  0.0,
-          -0.5, -0.5,  0.0,
-           0.5, -0.5,  0.0
+           -0.5,  -0.5,  0.0,
+           0.5,  -0.5,  0.0
         ];
 
+
+        // copies data into buffer
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW); 
 
         var bufferInfo = {
@@ -107,20 +120,21 @@
 
         // drawing scene *******************************************************************
 
-        gl.clearColor(1.0, 1.0, 1.0, 0.0);
+        gl.clearColor(0.0, 0.0, 1.0, 0.0);
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         // check with this 
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight); // new thing
 
-        console.log(gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-        
-
+      
         gl.vertexAttribPointer(positionLocation, bufferInfo.itemSize, gl.FLOAT, false, 0, 0);
              
         gl.drawArrays(gl.TRIANGLES, 0, bufferInfo.numberOfItems);
+
+        var input = document.getElementsByTagName("input");
+        console.log(input);
+        input.oninput= function(){console.log('1111');};
 
       };
     }());
