@@ -68,31 +68,54 @@
             var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER, "shader-fs");
             gl.shaderSource(fragmentShader, fragmentShaderCode);
             gl.compileShader(fragmentShader);
-            return checkShaderCompilationStatus(fragmentShader, gl);
+            return checkShaderCompilationStatus(fragmentShader, gl) ? fragmentShader : false;
         }
 
         function createVertexShader(vertexShaderCode, gl) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER, "shader-vs");
             gl.shaderSource(vertexShader, vertexShaderCode);
             gl.compileShader(vertexShader);
-            return checkShaderCompilationStatus(vertexShader, gl);
+            return checkShaderCompilationStatus(vertexShader, gl) ? vertexShader : false;
         }
 
-        function createShaders(gl, ajax) {
+        function loadAndCompileVertexShader(gl, ajax) {
+            var vertexShader;
 
             loadVertexShader(function (xhr) {
-                createVertexShader(xhr, gl);
+                vertexShader = createVertexShader(xhr, gl);
             }, ajax);
+
+            return vertexShader;
+        }
+
+        function loadAndCompileFragmentShader(gl, ajax) {
+            var fragmentShader;
 
             loadFragmentShader(function (xhr) {
-                createFragmentShader(xhr, gl);
+                fragmentShader = createFragmentShader(xhr, gl);
             }, ajax);
 
+            return fragmentShader;
+        }
+
+        function createProgramAndAttachShaders(gl, vertexShader, fragmentShader) {
+            var shaderProgram = gl.createProgram();
+
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+
+            // link to the context
+            gl.linkProgram(shaderProgram);
+
+            // and using this program
+            gl.useProgram(shaderProgram);
         }
 
         return {
-            initShaders: function (gl, ajax) {
-                createShaders(gl, ajax);
+            initWebGl: function (gl, ajax) {
+                var fragmentShader = loadAndCompileFragmentShader(gl, ajax);
+                var vertexShader = loadAndCompileVertexShader(gl, ajax);
+                createProgramAndAttachShaders(gl, vertexShader, fragmentShader);
             },
 
             clearCanvas: function(gl, r, g, b, a) {
@@ -159,9 +182,11 @@
 
             var gl = getWebGlContextByCanvas("canvas");
 
-            webGl_utils.initShaders(gl, ajax);
+            webGl_utils.initWebGl(gl, ajax);
 
-            webGl_utils.clearCanvas(gl, 1.0);
+            webGl_utils.clearCanvas(gl);
+
+            gl.drawArrays(gl.POINTS, 0, 1);
 
         }
 
