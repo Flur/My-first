@@ -109,13 +109,15 @@
 
             // and using this program
             gl.useProgram(shaderProgram);
+
+            return shaderProgram;
         }
 
         return {
             initWebGl: function (gl, ajax) {
                 var fragmentShader = loadAndCompileFragmentShader(gl, ajax);
                 var vertexShader = loadAndCompileVertexShader(gl, ajax);
-                createProgramAndAttachShaders(gl, vertexShader, fragmentShader);
+                return createProgramAndAttachShaders(gl, vertexShader, fragmentShader);
             },
 
             clearCanvas: function(gl, r, g, b, a) {
@@ -180,9 +182,17 @@
 
         function main() {
 
+            var a_Position,
+                program;
+
             var gl = getWebGlContextByCanvas("canvas");
 
-            webGl_utils.initWebGl(gl, ajax);
+            // returns program obj
+            program = webGl_utils.initWebGl(gl, ajax);
+
+            a_Position = gl.getAttribLocation(program, "a_Position");
+
+            gl.vertexAttrib3f(a_Position, 0.5, 0.0, 0.0);
 
             webGl_utils.clearCanvas(gl);
 
