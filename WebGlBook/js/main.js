@@ -22,7 +22,7 @@
         },
 
         errorHandler: {
-            shadersLoadingFailed: function(msg) {
+            shadersLoadingFailed: function (msg) {
                 msg = msg || "";
                 console.log("Could not load shader.\n" + msg);
             }
@@ -33,16 +33,26 @@
      *   Module for common WebGl things
      *   such as load shader, etc.
      * */
-    var webGl_utils = (function (){
+    var webGl_utils = (function () {
 
         const _SHADERS_URLS = {
             vertex: "./shaders/vs.vert",
             fragment: "./shaders/fs.frag"
         };
 
+        function checkShaderCompilationStatus(shader, gl) {
+            var shaderStatus = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+            if (!shaderStatus) {
+                throw "shader + :" + gl.getShaderInfoLog(shader);
+            }
+            return shaderStatus;
+        }
+
         function loadShader(shader, ajax, success) {
             ajax(success, _U.errorHandler.shadersLoadingFailed, {
-                url: _SHADERS_URLS[shader]
+                url: _SHADERS_URLS[shader],
+                // if true compilation error
+                async: false
             })
         }
 
@@ -54,28 +64,40 @@
             loadShader("fragment", ajax, success);
         }
 
-        function loadShaders(gl, ajax) {
-            loadFragmentShader(function(){}, ajax);
-            loadVertexShader(function(){}, ajax);
+        function createFragmentShader(fragmentShaderCode, gl) {
+            var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER, "shader-fs");
+            gl.shaderSource(fragmentShader, fragmentShaderCode);
+            gl.compileShader(fragmentShader);
+            return checkShaderCompilationStatus(fragmentShader, gl);
         }
 
-        function createShader(shaderCode, type) {
-
-            // HERE I HAVE STTOPED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER, "shader-fs");
+        function createVertexShader(vertexShaderCode, gl) {
             var vertexShader = gl.createShader(gl.VERTEX_SHADER, "shader-vs");
-
-            gl.shaderSource(fragmentShader, fragmentShaderCode);
             gl.shaderSource(vertexShader, vertexShaderCode);
-
-            gl.compileShader(fragmentShader);
             gl.compileShader(vertexShader);
+            return checkShaderCompilationStatus(vertexShader, gl);
+        }
+
+        function createShaders(gl, ajax) {
+
+            loadVertexShader(function (xhr) {
+                createVertexShader(xhr, gl);
+            }, ajax);
+
+            loadFragmentShader(function (xhr) {
+                createFragmentShader(xhr, gl);
+            }, ajax);
+
         }
 
         return {
-            initShaders: function(gl, ajax) {
+            initShaders: function (gl, ajax) {
+                createShaders(gl, ajax);
+            },
 
+            clearCanvas: function(gl, r, g, b, a) {
+                gl.clearColor(r || 0.0, g || 0.0, b || 0.0, a || 1.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
             }
         }
     }());
@@ -89,7 +111,8 @@
             url: "",
             method: "GET",
             success: _U.noop,
-            error: _U.noop
+            error: _U.noop,
+            async: true
         };
 
         function serializeAjaxSettings(success, error, settings) {
@@ -100,9 +123,10 @@
 
         function sendAjaxRequest(settings) {
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open(settings.method, settings.url, true);
+            xmlHttp.open(settings.method, settings.url, settings.async);
             xmlHttp.onreadystatechange = function () {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    // in some cases not good to pass in arguments only response
                     settings.success(xmlHttp.response);
                 } else if (xmlHttp.readyState == 4 && xmlHttp.status !== 200) {
                     settings.error(xmlHttp);
@@ -132,11 +156,12 @@
         }
 
         function main() {
+
             var gl = getWebGlContextByCanvas("canvas");
 
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            webGl_utils.initShaders(gl, ajax);
 
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            webGl_utils.clearCanvas(gl, 1.0);
 
         }
 

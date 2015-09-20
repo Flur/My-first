@@ -86,7 +86,7 @@
         var positionLocation = gl.getAttribLocation(shaderProgram, "a_position");
 
         // enable attribute
-        gl.enableVertexAttribArray(positionLocation) 
+        gl.enableVertexAttribArray(positionLocation);
 
         // check if with program all ok
         var programStatus = gl.getProgramParameter(shaderProgram, gl.LINK_STATUS);
@@ -116,7 +116,7 @@
         var bufferInfo = {
           itemSize: 3,
           numberOfItems: 3
-        }
+        };
 
         // drawing scene *******************************************************************
 
