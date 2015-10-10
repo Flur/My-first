@@ -167,6 +167,40 @@
     }());
 
     /*
+     *   Module for canvas events
+     * */
+    var canvasEvents = (function(){
+
+        var g_Points = [];
+
+        // no need in canvas, can take reference from event
+        function onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position) {
+            var pointsLength;
+            var x = ev.clientX;
+            var y = ev.clientY;
+            var rect = canvas.getBoundingClientRect(); // ev.target
+            x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
+            y = ((y - rect.top) - canvas.width / 2) / (canvas.width / 2);
+
+            g_Points.push(x,y);
+            pointsLength = g_Points.length;
+
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            for (var i = 0 ; i < pointsLength ; i+=2) {
+                gl.vertexAttrib2f(a_Position, g_Points[i], g_Points[i+1]);
+                gl.drawArrays(gl.POINTS, 0, 1);
+            }
+        }
+
+        return {
+            init: function(gl, canvas, a_Position) {
+                canvas.onmousedown = function(ev) {onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position)}
+            }
+        }
+    }());
+
+    /*
      *   Main module
      * */
     window.onload = (function () {
@@ -183,6 +217,7 @@
         function main() {
 
             var a_Position,
+                a_PointSize,
                 program;
 
             var gl = getWebGlContextByCanvas("canvas");
@@ -194,9 +229,15 @@
 
             gl.vertexAttrib3f(a_Position, 0.5, 0.0, 0.0);
 
+            a_PointSize = gl.getAttribLocation(program, "a_PointSize");
+
+            gl.vertexAttrib1f(a_PointSize, 50.0);
+
             webGl_utils.clearCanvas(gl);
 
             gl.drawArrays(gl.POINTS, 0, 1);
+
+            canvasEvents.init(gl, canvas, a_Position);
 
         }
 
