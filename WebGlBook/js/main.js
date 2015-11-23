@@ -171,33 +171,56 @@
      * */
     var canvasEvents = (function(){
 
-        var g_Points = [];
+        var xy = [];
+        var rgba = [];
+        var sizes = [];
+        const colors = {
+            red: [1.0 , 0.0, 0.0, 1.0],
+            green: [0.0, 1.0, 0.0, 1.0],
+            blue: [0.0, 0.0, 1.0, 1.0],
+            white: [1.0, 1.0, 1.0, 1.0]
+        };
 
         // no need in canvas, can take reference from event
-        function onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position) {
+        function onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position, u_FragColor, a_PointSize) {
             var pointsLength;
             var x = ev.clientX;
             var y = ev.clientY;
             var rect = canvas.getBoundingClientRect(); // ev.target
             x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
-            y = ((y - rect.top) - canvas.width / 2) / (canvas.width / 2);
+            y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
 
-            g_Points.push(x,y);
-            pointsLength = g_Points.length;
+            xy.push([x,y]);
+            sizes.push(Math.random() * 10);
+            rgba.push(colorSelector(x, y));
+            pointsLength = xy.length;
 
+            // can use webgl_utils
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            for (var i = 0 ; i < pointsLength ; i+=2) {
-                gl.vertexAttrib2f(a_Position, g_Points[i], g_Points[i+1]);
+            for (var i = 0 ; i < pointsLength ; i+=1) {
+                gl.vertexAttrib2f(a_Position, xy[i][0], xy[i][1]);
+                gl.vertexAttrib1f(a_PointSize, sizes[i]);
+                gl.uniform4f(u_FragColor, rgba[i][0], rgba[i][1], rgba[i][2], rgba[i][3]);
                 gl.drawArrays(gl.POINTS, 0, 1);
+            }
+
+        }
+
+        function colorSelector(x, y) {
+            if (x < 0) {
+                return y > 0 ? colors.red : colors.blue;
+            } else {
+                return y > 0 ? colors.green : colors.white;
             }
         }
 
         return {
-            init: function(gl, canvas, a_Position) {
-                canvas.onmousedown = function(ev) {onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position)}
+            init: function(gl, canvas, a_Position, u_FragColor, a_PointSize) {
+                canvas.onmousedown = function(ev) {onMouseDownCanvasEventHandler(ev, gl, canvas, a_Position,
+                    u_FragColor, a_PointSize)}
             }
-        }
+        };
     }());
 
     /*
@@ -218,6 +241,7 @@
 
             var a_Position,
                 a_PointSize,
+                u_FragColor,
                 program;
 
             var gl = getWebGlContextByCanvas("canvas");
@@ -227,17 +251,13 @@
 
             a_Position = gl.getAttribLocation(program, "a_Position");
 
-            gl.vertexAttrib3f(a_Position, 0.5, 0.0, 0.0);
+            u_FragColor = gl.getUniformLocation(program, "u_FragColor");
 
             a_PointSize = gl.getAttribLocation(program, "a_PointSize");
 
-            gl.vertexAttrib1f(a_PointSize, 50.0);
-
             webGl_utils.clearCanvas(gl);
 
-            gl.drawArrays(gl.POINTS, 0, 1);
-
-            canvasEvents.init(gl, canvas, a_Position);
+            canvasEvents.init(gl, canvas, a_Position, u_FragColor, a_PointSize);
 
         }
 
